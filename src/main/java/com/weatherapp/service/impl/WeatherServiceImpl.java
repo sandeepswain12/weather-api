@@ -5,7 +5,6 @@ import com.weatherapp.dtos.WeatherReq;
 import com.weatherapp.dtos.WeatherRes;
 import com.weatherapp.entity.Pincode;
 import com.weatherapp.entity.Weather;
-import com.weatherapp.exception.GlobalExceptionHandler;
 import com.weatherapp.exception.PincodeNotFoundException;
 import com.weatherapp.repository.PincodeRepo;
 import com.weatherapp.repository.WeatherRepo;
@@ -57,12 +56,12 @@ public class WeatherServiceImpl implements WeatherService {
 
         if (cached.isPresent()) {
             logger.info("Weather found in cache for pincode: {} and date: {}", request.getPincode(), request.getForDate());
-            return mapToResponse(cached.get());
+            return modelMapper.map(cached.get(),WeatherRes.class);
         }
 
         logger.info("Fetching fresh weather data from external API...");
         Weather info = fetchWeatherAndSave(pin, request.getForDate());
-        return mapToResponse(info);
+        return modelMapper.map(info,WeatherRes.class);
     }
 
     private Pincode fetchAndSaveLatLong(String pincode) {
@@ -106,7 +105,4 @@ public class WeatherServiceImpl implements WeatherService {
         return weatherRepo.save(info);
     }
 
-    private WeatherRes mapToResponse(Weather info) {
-        return modelMapper.map(info, WeatherRes.class);
-    }
 }
