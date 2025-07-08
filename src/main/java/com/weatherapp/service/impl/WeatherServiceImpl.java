@@ -10,6 +10,7 @@ import com.weatherapp.exception.PincodeNotFoundException;
 import com.weatherapp.repository.PincodeRepo;
 import com.weatherapp.repository.WeatherRepo;
 import com.weatherapp.service.WeatherService;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +30,13 @@ public class WeatherServiceImpl implements WeatherService {
     private WeatherRepo weatherRepo;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Value("${openweather.api.key}")
     private String apiKey;
 
-    Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    Logger logger = LoggerFactory.getLogger(WeatherServiceImpl.class);
 
     @Override
     public WeatherRes getWeather(WeatherReq request) {
@@ -104,13 +107,6 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     private WeatherRes mapToResponse(Weather info) {
-        WeatherRes res = new WeatherRes();
-        res.setPincode(info.getPincode().getPincode());
-        res.setDate(info.getDate());
-        res.setTemperature(info.getTemperature());
-        res.setDescription(info.getDescription());
-        res.setHumidity(info.getHumidity());
-        res.setWindSpeed(info.getWindSpeed());
-        return res;
+        return modelMapper.map(info, WeatherRes.class);
     }
 }
